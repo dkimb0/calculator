@@ -34,27 +34,34 @@
     </div>
 
     <div class="equalsOrClear">
-        <button id="equals">=</button>
-        <button id="clear">clear</button>
+        <button id="equals">= (ENTER)</button>
+        <button id="clear">clear (ESC)</button>
         <button id="backspace">backspace</button>
     </div>
         
     <script>
+        //To do list:
+        //Simplify code
+        //put each section into functions
+        //figure out how to put multiple event listeners onto same functions
+        //set "No errors" as variable, then set each display to that var
+
+
         //individual arithmetic functions
-        function add(a, b){
-            return a + b;
+        function add(numOne, numTwo){
+            return numOne + numTwo;
         }
 
-        function subtract(a, b){
-            return a - b;
+        function subtract(numOne, numTwo){
+            return numOne - numTwo;
         }
 
-        function multiply(a, b){
-            return a * b;
+        function multiply(numOne, numTwo){
+            return numOne * numTwo;
         }
 
-        function divide(a, b){
-            return a / b;
+        function divide(numOne, numTwo){
+            return numOne / numTwo;
         }
 
         //math functions combined into one function
@@ -95,23 +102,40 @@
             }
         }
 
-        function outputValues(array, inputNum, outputNum){
+        const outputValues = (array, inputNum, outputNum) =>{
             array.push(inputNum);
             outputNum = array.join('');
-            display(outputNum);
-            return array;
+            displayResult(outputNum);
+            displayError('No errors');
+            return {array, outputNum};
+
         }
+
+        // const operatorInput = (lastOp, newOp) => {
+
+        // }
 
 
         //initialize values
-        let a = [];
-        let b = [];
+        
+        let aObj = {
+            array : [],
+            outputNum : 0,
+        }
+
+        let bObj = {
+            array : [],
+            outputNum : NaN,
+        }
+
+        // let aObj.array = [];
+        // let bObj.array = [];
         let decimalArray = [];
 
-        let aNum = 0;
-        let bNum = NaN;
+        // let aObj.outputNum = 0;
+        // let bObj.outputNum = NaN;
 
-        displayResult(aNum);
+        displayResult(aObj.outputNum);
         displayError('No errors');
 
         let operatorOn = false;
@@ -128,15 +152,9 @@
         numButtons.forEach((numButton) => {
             numButton.addEventListener('click', () => {
                 if (!operatorOn){
-                    // a.push(event.target.innerText);
-                    // aNum = a.join('');
-                    // displayResult(aNum);
-                    outputValues(a, event.target.innerText, aNum);
+                    aObj = outputValues(aObj.array, event.target.innerText, aObj.outputNum);
                 }else{
-                    // b.push(event.target.innerText);
-                    // bNum = b.join('');
-                    // displayResult(bNum);
-                    outputValues(b, event.target.innerText, bNum);
+                    bObj = outputValues(bObj.array, event.target.innerText, bObj.outputNum);
                 }
                 
             });
@@ -155,10 +173,10 @@
                 lastOperator = newOperator;
                 newOperator = event.target.innerText;
                 if (operatorOn){
-                    aNum = operate(lastOperator, aNum, bNum);
-                    displayResult(round(aNum));
-                    bNum = NaN;
-                    b = [];
+                    aObj.outputNum = operate(lastOperator, aObj.outputNum, bObj.outputNum);
+                    displayResult(round(aObj.outputNum));
+                    bObj.outputNum = NaN;
+                    bObj.array = [];
                 };
 
                 operatorOn = true;
@@ -171,29 +189,30 @@
         const equalButton = document.querySelector('#equals');
 
         equalButton.addEventListener('click', () => {
-            if (bNum === '0' && newOperator === '/'){
-                aNum = 0;
-                bNum = NaN;
-                a = [];
-                b = [];
+            if (bObj.outputNum === '0' && newOperator === '/'){
+                aObj.outputNum = 0;
+                bObj.outputNum = NaN;
+                aObj.array = [];
+                bObj.array = [];
                 displayError('Error: cannot divide by 0');
 
             }else if(newOperator === ''){
                 displayError('Error: operator missing');
             
 
-            }else if(Number.isNaN(bNum)){
+            }else if(Number.isNaN(bObj.outputNum)){
                 displayError('Error: second number missing');
 
 
             }else{
-                aNum = operate(newOperator, aNum, bNum);
-                displayResult(round(aNum));
-                a = 0;
-                bNum = NaN;
-                a = [];
-                b = [];
+                aObj.outputNum = operate(newOperator, aObj.outputNum, bObj.outputNum);
+                displayResult(round(aObj.outputNum));
+                aObj.array = 0;
+                bObj.outputNum = NaN;
+                aObj.array = [];
+                bObj.array = [];
                 operatorOn = false;
+                displayError('No errors');
             }
 
 
@@ -205,15 +224,15 @@
 
         clearButton.addEventListener('click', () => {
             //reinitialize
-            a = [];
-            b = [];
-            aNum = 0;
-            bNum = NaN;
+            aObj.array = [];
+            bObj.array = [];
+            aObj.outputNum = 0;
+            bObj.outputNum = NaN;
             operatorOn = false;
             decimalOn = false;
             lastOperator = '';
             newOperator = '';
-            displayResult(aNum);
+            displayResult(aObj.outputNum);
             displayError('No errors');
         })
 
@@ -222,12 +241,12 @@
         decimalButton.addEventListener('click', () => {
             
             if(operatorOn === false && decimalOn === false){
-                a.push('.');
-                displayResult(a.join(''));
+                aObj.array.push('.');
+                displayResult(aObj.array.join(''));
                 decimalOn = true;
             }else if (operatorOn === true && decimalOn === false){
-                b.push('.');
-                displayResult(b.join(''));
+                bObj.array.push('.');
+                displayResult(bObj.array.join(''));
                 decimalOn = true;
             }
             
@@ -238,28 +257,28 @@
 
         backspaceButton.addEventListener('click', () => {
             if (!operatorOn){
-                    decimalBackspaceCheck = a.pop();
+                    decimalBackspaceCheck = aObj.array.pop();
                     if (decimalBackspaceCheck === '.'){
                         decimalOn = false;
                     }
-                    aNum = a.join('');
-                    if (aNum === ''){
+                    aObj.outputNum = aObj.array.join('');
+                    if (aObj.outputNum === ''){
                         displayResult(0);
                     }else{
-                        displayResult(aNum);
+                        displayResult(aObj.outputNum);
                     }
             }else{
-                decimalBackspaceCheck = b.pop();
+                decimalBackspaceCheck = bObj.array.pop();
                 if (decimalBackspaceCheck === '.'){
                         decimalOn = false;
                     }
-                bNum = b.join('');
-                if (bNum === ''){
+                bObj.outputNum = bObj.array.join('');
+                if (bObj.outputNum === ''){
                     displayResult(0);
                 }else{
-                    displayResult(bNum);
+                    displayResult(bObj.outputNum);
                 }
-                displayResult(bNum);
+                displayResult(bObj.outputNum);
             }
         });
 
@@ -270,94 +289,92 @@
             
             if (parseInt(name) >= 0 && parseInt(name) <= 9){
                 if (!operatorOn){
-                    a.push(name);
-                    aNum = a.join('');
-                    displayResult(aNum);
+                    aObj = outputValues(aObj.array, name, aObj.outputNum);
                 }else{
-                    b.push(name);
-                    bNum = b.join('');
-                    displayResult(bNum);
+                    bObj = outputValues(bObj.array, name, bObj.outputNum);
                 }
             }else if (name === 'Backspace'){
                 if (!operatorOn){
-                    decimalBackspaceCheck = a.pop();
+                    decimalBackspaceCheck = aObj.array.pop();
                     if (decimalBackspaceCheck === '.'){
                         decimalOn = false;
                     }
-                    aNum = a.join('');
-                    if (aNum === ''){
+                    aObj.outputNum = aObj.array.join('');
+                    if (aObj.outputNum === ''){
                         displayResult(0);
                     }else{
-                        displayResult(aNum);
+                        displayResult(aObj.outputNum);
                     }
                 }else{
-                    decimalBackspaceCheck = b.pop();
+                    decimalBackspaceCheck = bObj.array.pop();
                     if (decimalBackspaceCheck === '.'){
                             decimalOn = false;
                         }
-                    bNum = b.join('');
-                    if (bNum === ''){
+                    bObj.outputNum = bObj.array.join('');
+                    if (bObj.outputNum === ''){
                         displayResult(0);
                     }else{
-                        displayResult(bNum);
+                        displayResult(bObj.outputNum);
                     }
-                    displayResult(bNum);
+                    displayResult(bObj.outputNum);
                 }
             }else if (name === '.'){
                 if(operatorOn === false && decimalOn === false){
-                    a.push('.');
-                    displayResult(a.join(''));
+                    aObj.array.push('.');
+                    displayResult(aObj.array.join(''));
                     decimalOn = true;
                 }else if (operatorOn === true && decimalOn === false){
-                    b.push('.');
-                    displayResult(b.join(''));
+                    bObj.array.push('.');
+                    displayResult(bObj.array.join(''));
                     decimalOn = true;
             }
 
             }else if (name === 'Enter'){
-                if (bNum === '0' && newOperator === '/'){
-                aNum = 0;
-                bNum = NaN;
-                a = [];
-                b = [];
+                if (bObj.outputNum === '0' && newOperator === '/'){
+                aObj.outputNum = 0;
+                bObj.outputNum = NaN;
+                aObj.array = [];
+                bObj.array = [];
                 displayError('Error: cannot divide by 0');
 
                 }else if(newOperator === ''){
                     displayError('Error: operator missing');
                 
 
-                }else if(Number.isNaN(bNum)){
+                }else if(Number.isNaN(bObj.outputNum)){
                     displayError('Error: second number missing');
 
 
                 }else{
-                    aNum = operate(newOperator, aNum, bNum);
-                    displayResult(round(aNum));
-                    a = 0;
-                    bNum = NaN;
-                    a = [];
-                    b = [];
+                    aObj.outputNum = operate(newOperator, aObj.outputNum, bObj.outputNum);
+                    displayResult(round(aObj.outputNum));
+                    aObj.array = 0;
+                    bObj.outputNum = NaN;
+                    aObj.array = [];
+                    bObj.array = [];
                     operatorOn = false;
+                    displayError('No errors');
                 }
             }else if (name === 'Escape'){
-                a = [];
-                b = [];
-                aNum = 0;
-                bNum = NaN;
+                aObj.array = [];
+                bObj.array = [];
+                aObj.outputNum = 0;
+                bObj.outputNum = NaN;
                 operatorOn = false;
                 decimalOn = false;
                 lastOperator = '';
                 newOperator = '';
-                displayResult(aNum);
+                displayResult(aObj.outputNum);
                 displayError('No errors');
             }else if (name === '+' || name === '-' || name === '*' || name === '/'){
                 lastOperator = newOperator;
                 newOperator = name;
+                console.log(newOperator);
                 if (operatorOn){
-                    aNum = operate(lastOperator, aNum, bNum);
-                    displayResult(round(aNum));
-                    bNum = NaN;
-                    b = [];
+                    aObj.outputNum = operate(lastOperator, aObj.outputNum, bObj.outputNum);
+                    displayResult(round(aObj.outputNum));
+                    bObj.outputNum = NaN;
+                    bObj.array = [];
                 };
 
                 operatorOn = true;
