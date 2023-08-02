@@ -66,20 +66,34 @@
         }
 
         function display(text){
-            document.getElementById('displayText').innerHTML = text;    
+            document.getElementById('displayText').innerHTML = text;
         }
 
+        function round(decimal){
+            if (decimal % 1 !== 0 && typeof decimal === "number"){
+                return decimal.toFixed(9);
+            }else{
+                return decimal;
+            }
+        }
+
+        //function calculate()
+
+        //initialize values
         let a = [];
         let b = [];
 
         let aNum = 0;
-        let bNum = 0;
+        let bNum = NaN;
 
         display(aNum);
 
         let operatorOn = false;
-        let operatorType;
+        
+        let lastOperator = '';
+        let newOperator = '';
 
+        //set up number button click events
         const numButtons = document.querySelectorAll('div.numButton > button');
 
         numButtons.forEach((numButton) => {
@@ -97,43 +111,65 @@
             });
         });
 
+        //set up operator buttons click events
         const opButtons = document.querySelectorAll('div.opButton > button');
 
         opButtons.forEach((opButton) => {
             opButton.addEventListener('click', () => {
+                lastOperator = newOperator;
+                newOperator = event.target.innerText;
+
+                if (operatorOn){
+                    aNum = operate(lastOperator, aNum, bNum);
+                    display(round(aNum));
+                    bNum = NaN;
+                    b = [];
+                };
+
                 operatorOn = true;
-                operatorType = event.target.innerText;
+
             });
         });
 
+        //set up equals button click event
         const equalButton = document.querySelector('#equals');
 
         equalButton.addEventListener('click', () => {
-            if (bNum === 0 && operatorType === '/'){
-                display('Error, cannot divide by 0');
-                aNum = 0;
-                a = [];
+            if (bNum === 0 && newOperator === '/'){
+                display('Error: cannot divide by 0');
+                // aNum = 0;
+                // a = [];
+            }else if(Number.isNaN(bNum)){
+                display('Error: second number missing');
+                // aNum = 0;
+                // a = [];
+            }else if(newOperator === ''){
+                display('Error: operator missing');
+
             }else{
-                aNum = operate(operatorType, aNum, bNum);
-                display(aNum);
+                aNum = operate(newOperator, aNum, bNum);
+                display(round(aNum));
+                bNum = NaN;
+                b = [];
+                operatorOn = false;
             }
 
-            bNum = 0;
-            b = [];
-            operatorOn = false;
 
 
-        })
+        });
 
+        //set up clear button click event
         const clearButton = document.querySelector('#clear');
 
         clearButton.addEventListener('click', () => {
+            //reinitialize
             a = [];
             b = [];
             aNum = 0;
             bNum = 0;
             operatorOn = false;
-
+            lastOperator = '';
+            newOperator = '';
             display(aNum);
         })
 
