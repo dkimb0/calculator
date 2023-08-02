@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="displayResult">
@@ -11,32 +12,29 @@
         <p id="displayError"></p>
     </div>
     
-    <div class="numButton">
-        <button>1</button>
-        <button>2</button>    
-        <button>3</button>
-        <button>4</button>
-        <button>5</button>
-        <button>6</button>
-        <button>7</button>
-        <button>8</button>
-        <button>9</button>
-        <button>0</button>
-    </div>
+    <div class="buttons">
+        <button class="numButton">1</button>
+        <button class="numButton">2</button>    
+        <button class="numButton">3</button>
+        <button class="numButton">4</button>
+        <button class="numButton">5</button>
+        <button class="numButton">6</button>
+        <button class="numButton">7</button>
+        <button class="numButton">8</button>
+        <button class="numButton">9</button>
+        <button class="numButton">0</button>
+        <button id="decimal">.</button>
+        <button class="opButton">+</button>
+        <button class="opButton">-</button>
+        <button class="opButton">*</button>
+        <button class="opButton">/</button>
 
-    <button id="decimal">.</button>
-
-    <div class="opButton">
-        <button>+</button>
-        <button>-</button>
-        <button>*</button>
-        <button>/</button>
     </div>
 
     <div class="equalsOrClear">
-        <button id="equals">= (ENTER)</button>
-        <button id="clear">clear (ESC)</button>
-        <button id="backspace">backspace</button>
+        <button id="equals">EQUAL<br>(Enter)</button>
+        <button id="clear">CLEAR<br>(Escape)</button>
+        <button id="backspace">DELETE<br>(Backspace)</button>
     </div>
         
     <script>
@@ -44,7 +42,7 @@
         //Simplify code
         //put each section into functions
         //figure out how to put multiple event listeners onto same functions
-        //set "No errors" as variable, then set each display to that var
+        //set "" as variable, then set each display to that var
 
 
         //individual arithmetic functions
@@ -93,10 +91,12 @@
 
         //rounding decimals to smaller float function
         function round(decimal){
+            
             if (decimal % 1 !== 0 && typeof decimal === "number" &&
-            decimal.toString().length > 10){
-                return decimal.toFixed(9);
-                console.log(decimal);
+            decimal.toString().length > 9){
+                
+                return parseFloat(decimal.toString().slice(0, 10));
+                
             }else{
                 return decimal;
             }
@@ -106,7 +106,7 @@
             array.push(inputNum);
             outputNum = array.join('');
             displayResult(outputNum);
-            displayError('No errors');
+            displayError('');
             return {array, outputNum};
 
         }
@@ -136,7 +136,7 @@
         // let bObj.outputNum = NaN;
 
         displayResult(aObj.outputNum);
-        displayError('No errors');
+        displayError('');
 
         let operatorOn = false;
         let decimalOn = false;
@@ -147,7 +147,7 @@
 
 
         //set up number button click events
-        const numButtons = document.querySelectorAll('div.numButton > button');
+        const numButtons = document.querySelectorAll('.numButton');
 
         numButtons.forEach((numButton) => {
             numButton.addEventListener('click', () => {
@@ -166,7 +166,7 @@
 
 
         //set up operator buttons click events
-        const opButtons = document.querySelectorAll('div.opButton > button');
+        const opButtons = document.querySelectorAll('.opButton');
 
         opButtons.forEach((opButton) => {
             opButton.addEventListener('click', () => {
@@ -194,14 +194,14 @@
                 bObj.outputNum = NaN;
                 aObj.array = [];
                 bObj.array = [];
-                displayError('Error: cannot divide by 0');
+                displayError('Error: cannot divide by 0.<br>CLEAR to reset.');
 
             }else if(newOperator === ''){
-                displayError('Error: operator missing');
+                displayError('Error: operator missing.<br>Enter it now.');
             
 
             }else if(Number.isNaN(bObj.outputNum)){
-                displayError('Error: second number missing');
+                displayError('Error: second number missing.<br>Enter it now.');
 
 
             }else{
@@ -212,7 +212,7 @@
                 aObj.array = [];
                 bObj.array = [];
                 operatorOn = false;
-                displayError('No errors');
+                displayError('');
             }
 
 
@@ -233,7 +233,7 @@
             lastOperator = '';
             newOperator = '';
             displayResult(aObj.outputNum);
-            displayError('No errors');
+            displayError('');
         })
 
         const decimalButton = document.querySelector("#decimal");
@@ -335,14 +335,14 @@
                 bObj.outputNum = NaN;
                 aObj.array = [];
                 bObj.array = [];
-                displayError('Error: cannot divide by 0');
+                displayError('Error: cannot divide by 0.<br>CLEAR to reset.');
 
                 }else if(newOperator === ''){
-                    displayError('Error: operator missing');
+                    displayError('Error: operator missing.<br>Enter it now.');
                 
 
                 }else if(Number.isNaN(bObj.outputNum)){
-                    displayError('Error: second number missing');
+                    displayError('Error: second number missing.<br>Enter it now.');
 
 
                 }else{
@@ -353,7 +353,7 @@
                     aObj.array = [];
                     bObj.array = [];
                     operatorOn = false;
-                    displayError('No errors');
+                    displayError('');
                 }
             }else if (name === 'Escape'){
                 aObj.array = [];
@@ -365,7 +365,7 @@
                 lastOperator = '';
                 newOperator = '';
                 displayResult(aObj.outputNum);
-                displayError('No errors');
+                displayError('');
             }else if (name === '+' || name === '-' || name === '*' || name === '/'){
                 lastOperator = newOperator;
                 newOperator = name;
