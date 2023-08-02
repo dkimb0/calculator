@@ -42,7 +42,10 @@
         //Simplify code
         //put each section into functions
         //figure out how to put multiple event listeners onto same functions
-        //set "" as variable, then set each display to that var
+        //backspace after operator deletes everything
+        //error after clicking - after divide
+        //shows NaN if divide by zero on first go ahead (can’t replicate this error?)
+
 
 
         //individual arithmetic functions
@@ -103,11 +106,13 @@
         }
 
         const outputValues = (array, inputNum, outputNum) =>{
-            array.push(inputNum);
-            outputNum = array.join('');
-            displayResult(outputNum);
-            displayError('');
-            return {array, outputNum};
+            
+                array.push(inputNum);
+                outputNum = array.join('');
+                displayResult(outputNum);
+                displayError('');
+                return {array, outputNum};
+            
 
         }
 
@@ -138,6 +143,7 @@
         displayResult(aObj.outputNum);
         displayError('');
 
+        let secondNumber = false;
         let operatorOn = false;
         let decimalOn = false;
         let decimalBackspaceCheck = '';
@@ -151,10 +157,13 @@
 
         numButtons.forEach((numButton) => {
             numButton.addEventListener('click', () => {
-                if (!operatorOn){
-                    aObj = outputValues(aObj.array, event.target.innerText, aObj.outputNum);
-                }else{
-                    bObj = outputValues(bObj.array, event.target.innerText, bObj.outputNum);
+                if (parseInt(event.target.innerText) >= 0 && parseInt(event.target.innerText) <= 9){
+                    if (!secondNumber){
+                        aObj = outputValues(aObj.array, event.target.innerText, aObj.outputNum);
+                    }else{
+                        bObj = outputValues(bObj.array, event.target.innerText, bObj.outputNum);
+                }
+
                 }
                 
             });
@@ -172,13 +181,15 @@
             opButton.addEventListener('click', () => {
                 lastOperator = newOperator;
                 newOperator = event.target.innerText;
-                if (operatorOn){
+
+                if (secondNumber && !operatorOn){
                     aObj.outputNum = operate(lastOperator, aObj.outputNum, bObj.outputNum);
                     displayResult(round(aObj.outputNum));
                     bObj.outputNum = NaN;
                     bObj.array = [];
                 };
 
+                secondNumber = true;
                 operatorOn = true;
                 decimalOn = false;
 
@@ -211,6 +222,7 @@
                 bObj.outputNum = NaN;
                 aObj.array = [];
                 bObj.array = [];
+                secondNumber = false;
                 operatorOn = false;
                 displayError('');
             }
@@ -228,10 +240,11 @@
             bObj.array = [];
             aObj.outputNum = 0;
             bObj.outputNum = NaN;
-            operatorOn = false;
+            secondNumber = false;
             decimalOn = false;
             lastOperator = '';
             newOperator = '';
+            operatorOn = false;
             displayResult(aObj.outputNum);
             displayError('');
         })
@@ -240,11 +253,11 @@
 
         decimalButton.addEventListener('click', () => {
             
-            if(operatorOn === false && decimalOn === false){
+            if(secondNumber === false && decimalOn === false){
                 aObj.array.push('.');
                 displayResult(aObj.array.join(''));
                 decimalOn = true;
-            }else if (operatorOn === true && decimalOn === false){
+            }else if (secondNumber === true && decimalOn === false){
                 bObj.array.push('.');
                 displayResult(bObj.array.join(''));
                 decimalOn = true;
@@ -256,7 +269,7 @@
         const backspaceButton = document.querySelector('#backspace');
 
         backspaceButton.addEventListener('click', () => {
-            if (!operatorOn){
+            if (!secondNumber){
                     decimalBackspaceCheck = aObj.array.pop();
                     if (decimalBackspaceCheck === '.'){
                         decimalOn = false;
@@ -288,13 +301,13 @@
             let name = e.key;
             
             if (parseInt(name) >= 0 && parseInt(name) <= 9){
-                if (!operatorOn){
+                if (!secondNumber){
                     aObj = outputValues(aObj.array, name, aObj.outputNum);
                 }else{
                     bObj = outputValues(bObj.array, name, bObj.outputNum);
                 }
             }else if (name === 'Backspace'){
-                if (!operatorOn){
+                if (!secondNumber){
                     decimalBackspaceCheck = aObj.array.pop();
                     if (decimalBackspaceCheck === '.'){
                         decimalOn = false;
@@ -319,11 +332,11 @@
                     displayResult(bObj.outputNum);
                 }
             }else if (name === '.'){
-                if(operatorOn === false && decimalOn === false){
+                if(secondNumber === false && decimalOn === false){
                     aObj.array.push('.');
                     displayResult(aObj.array.join(''));
                     decimalOn = true;
-                }else if (operatorOn === true && decimalOn === false){
+                }else if (secondNumber === true && decimalOn === false){
                     bObj.array.push('.');
                     displayResult(bObj.array.join(''));
                     decimalOn = true;
@@ -352,6 +365,7 @@
                     bObj.outputNum = NaN;
                     aObj.array = [];
                     bObj.array = [];
+                    secondNumber = false;
                     operatorOn = false;
                     displayError('');
                 }
@@ -360,23 +374,28 @@
                 bObj.array = [];
                 aObj.outputNum = 0;
                 bObj.outputNum = NaN;
-                operatorOn = false;
+                secondNumber = false;
                 decimalOn = false;
                 lastOperator = '';
                 newOperator = '';
+                operatorOn = false;
                 displayResult(aObj.outputNum);
                 displayError('');
+
             }else if (name === '+' || name === '-' || name === '*' || name === '/'){
                 lastOperator = newOperator;
                 newOperator = name;
-                console.log(newOperator);
-                if (operatorOn){
+
+
+
+                if (secondNumber && !operatorOn){
                     aObj.outputNum = operate(lastOperator, aObj.outputNum, bObj.outputNum);
                     displayResult(round(aObj.outputNum));
                     bObj.outputNum = NaN;
                     bObj.array = [];
                 };
 
+                secondNumber = true;
                 operatorOn = true;
                 decimalOn = false;
 
