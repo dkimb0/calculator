@@ -40,6 +40,7 @@
     </div>
         
     <script>
+        //individual arithmetic functions
         function add(a, b){
             return a + b;
         }
@@ -56,6 +57,7 @@
             return a / b;
         }
 
+        //math functions combined into one function
         function operate(operator, numOne, numTwo){
             numOne = parseFloat(numOne);
             numTwo = parseFloat(numTwo);
@@ -72,14 +74,17 @@
             }
         }
 
+        //display result function
         function displayResult(text){
             document.getElementById('displayText').innerHTML = text;
         }
 
+        //display error function
         function displayError(text){
             document.getElementById('displayError').innerHTML = text;
         }
 
+        //rounding decimals to smaller float function
         function round(decimal){
             if (decimal % 1 !== 0 && typeof decimal === "number" &&
             decimal.toString().length > 10){
@@ -90,7 +95,13 @@
             }
         }
 
-        //function calculate()
+        function outputValues(array, inputNum, outputNum){
+            array.push(inputNum);
+            outputNum = array.join('');
+            display(outputNum);
+            return array;
+        }
+
 
         //initialize values
         let a = [];
@@ -117,17 +128,24 @@
         numButtons.forEach((numButton) => {
             numButton.addEventListener('click', () => {
                 if (!operatorOn){
-                    a.push(event.target.innerText);
-                    aNum = a.join('');
-                    displayResult(aNum);
+                    // a.push(event.target.innerText);
+                    // aNum = a.join('');
+                    // displayResult(aNum);
+                    outputValues(a, event.target.innerText, aNum);
                 }else{
-                    b.push(event.target.innerText);
-                    bNum = b.join('');
-                    displayResult(bNum);
+                    // b.push(event.target.innerText);
+                    // bNum = b.join('');
+                    // displayResult(bNum);
+                    outputValues(b, event.target.innerText, bNum);
                 }
                 
             });
         });
+
+
+
+
+
 
         //set up operator buttons click events
         const opButtons = document.querySelectorAll('div.opButton > button');
@@ -244,6 +262,111 @@
                 displayResult(bNum);
             }
         });
+
+
+        //add keyboard support
+        document.addEventListener('keydown', (e) =>{
+            let name = e.key;
+            
+            if (parseInt(name) >= 0 && parseInt(name) <= 9){
+                if (!operatorOn){
+                    a.push(name);
+                    aNum = a.join('');
+                    displayResult(aNum);
+                }else{
+                    b.push(name);
+                    bNum = b.join('');
+                    displayResult(bNum);
+                }
+            }else if (name === 'Backspace'){
+                if (!operatorOn){
+                    decimalBackspaceCheck = a.pop();
+                    if (decimalBackspaceCheck === '.'){
+                        decimalOn = false;
+                    }
+                    aNum = a.join('');
+                    if (aNum === ''){
+                        displayResult(0);
+                    }else{
+                        displayResult(aNum);
+                    }
+                }else{
+                    decimalBackspaceCheck = b.pop();
+                    if (decimalBackspaceCheck === '.'){
+                            decimalOn = false;
+                        }
+                    bNum = b.join('');
+                    if (bNum === ''){
+                        displayResult(0);
+                    }else{
+                        displayResult(bNum);
+                    }
+                    displayResult(bNum);
+                }
+            }else if (name === '.'){
+                if(operatorOn === false && decimalOn === false){
+                    a.push('.');
+                    displayResult(a.join(''));
+                    decimalOn = true;
+                }else if (operatorOn === true && decimalOn === false){
+                    b.push('.');
+                    displayResult(b.join(''));
+                    decimalOn = true;
+            }
+
+            }else if (name === 'Enter'){
+                if (bNum === '0' && newOperator === '/'){
+                aNum = 0;
+                bNum = NaN;
+                a = [];
+                b = [];
+                displayError('Error: cannot divide by 0');
+
+                }else if(newOperator === ''){
+                    displayError('Error: operator missing');
+                
+
+                }else if(Number.isNaN(bNum)){
+                    displayError('Error: second number missing');
+
+
+                }else{
+                    aNum = operate(newOperator, aNum, bNum);
+                    displayResult(round(aNum));
+                    a = 0;
+                    bNum = NaN;
+                    a = [];
+                    b = [];
+                    operatorOn = false;
+                }
+            }else if (name === 'Escape'){
+                a = [];
+                b = [];
+                aNum = 0;
+                bNum = NaN;
+                operatorOn = false;
+                decimalOn = false;
+                lastOperator = '';
+                newOperator = '';
+                displayResult(aNum);
+                displayError('No errors');
+            }else if (name === '+' || name === '-' || name === '*' || name === '/'){
+                lastOperator = newOperator;
+                newOperator = name;
+                if (operatorOn){
+                    aNum = operate(lastOperator, aNum, bNum);
+                    displayResult(round(aNum));
+                    bNum = NaN;
+                    b = [];
+                };
+
+                operatorOn = true;
+                decimalOn = false;
+
+            }
+            
+        })
+
 
     </script>
 </body>
