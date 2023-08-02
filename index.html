@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="display">
-        <p>1234</p>
+        <p id="displayText"></p>
     </div>
     
     <div class="numButton">
@@ -28,8 +28,11 @@
         <button>-</button>
         <button>*</button>
         <button>/</button>
-        <button>=</button>
-        <button>clear</button>
+    </div>
+
+    <div class="equalsOrClear">
+        <button id="equals">=</button>
+        <button id="clear">clear</button>
     </div>
         
     <script>
@@ -49,10 +52,6 @@
             return a / b;
         }
 
-        // let numOne
-        // let numTwo
-        // let operator
-
         function operate(operator, numOne, numTwo){
             switch(operator){
                 case '+':
@@ -66,7 +65,78 @@
             }
         }
 
-        console.log(operate('-',2, 5));
+        function display(text){
+            document.getElementById('displayText').innerHTML = text;    
+        }
+
+        let a = [];
+        let b = [];
+
+        let aNum = 0;
+        let bNum = 0;
+
+        display(aNum);
+
+        let operatorOn = false;
+        let operatorType;
+
+        const numButtons = document.querySelectorAll('div.numButton > button');
+
+        numButtons.forEach((numButton) => {
+            numButton.addEventListener('click', () => {
+                if (!operatorOn){
+                    a.push(event.target.innerText);
+                    aNum = parseInt(a.join(''));
+                    display(aNum);
+                }else{
+                    b.push(event.target.innerText);
+                    bNum = parseInt(b.join(''));
+                    display(bNum);
+                }
+                
+            });
+        });
+
+        const opButtons = document.querySelectorAll('div.opButton > button');
+
+        opButtons.forEach((opButton) => {
+            opButton.addEventListener('click', () => {
+                operatorOn = true;
+                operatorType = event.target.innerText;
+            });
+        });
+
+        const equalButton = document.querySelector('#equals');
+
+        equalButton.addEventListener('click', () => {
+            if (bNum === 0 && operatorType === '/'){
+                display('Error, cannot divide by 0');
+                aNum = 0;
+                a = [];
+            }else{
+                aNum = operate(operatorType, aNum, bNum);
+                display(aNum);
+            }
+
+            bNum = 0;
+            b = [];
+            operatorOn = false;
+
+
+        })
+
+        const clearButton = document.querySelector('#clear');
+
+        clearButton.addEventListener('click', () => {
+            a = [];
+            b = [];
+            aNum = 0;
+            bNum = 0;
+            operatorOn = false;
+
+            display(aNum);
+        })
+
 
 
     </script>
