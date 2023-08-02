@@ -23,6 +23,8 @@
         <button>0</button>
     </div>
 
+    <button id="decimal">.</button>
+
     <div class="opButton">
         <button>+</button>
         <button>-</button>
@@ -33,6 +35,7 @@
     <div class="equalsOrClear">
         <button id="equals">=</button>
         <button id="clear">clear</button>
+        <button id="backspace">backspace</button>
     </div>
         
     <script>
@@ -53,6 +56,9 @@
         }
 
         function operate(operator, numOne, numTwo){
+            numOne = parseFloat(numOne);
+            numTwo = parseFloat(numTwo);
+            
             switch(operator){
                 case '+':
                     return add(numOne, numTwo);
@@ -82,6 +88,7 @@
         //initialize values
         let a = [];
         let b = [];
+        let decimalArray = [];
 
         let aNum = 0;
         let bNum = NaN;
@@ -89,6 +96,7 @@
         display(aNum);
 
         let operatorOn = false;
+        let decimalOn = false;
         
         let lastOperator = '';
         let newOperator = '';
@@ -100,11 +108,11 @@
             numButton.addEventListener('click', () => {
                 if (!operatorOn){
                     a.push(event.target.innerText);
-                    aNum = parseInt(a.join(''));
+                    aNum = a.join('');
                     display(aNum);
                 }else{
                     b.push(event.target.innerText);
-                    bNum = parseInt(b.join(''));
+                    bNum = b.join('');
                     display(bNum);
                 }
                 
@@ -127,6 +135,7 @@
                 };
 
                 operatorOn = true;
+                decimalOn = false;
 
             });
         });
@@ -149,9 +158,12 @@
             }else{
                 aNum = operate(newOperator, aNum, bNum);
                 display(round(aNum));
+                // aNum = 0;
                 bNum = NaN;
+                // a = [];
                 b = [];
                 operatorOn = false;
+                // decimalOn = false;
             }
 
 
@@ -168,12 +180,51 @@
             aNum = 0;
             bNum = 0;
             operatorOn = false;
+            decimalOn = false;
             lastOperator = '';
             newOperator = '';
             display(aNum);
         })
 
+        const decimalButton = document.querySelector("#decimal");
 
+        decimalButton.addEventListener('click', () => {
+            
+            if(operatorOn === false && decimalOn === false){
+                a.push('.');
+                display(a.join(''));
+                decimalOn = true;
+            }else if (operatorOn === true && decimalOn === false){
+                b.push('.');
+                display(b.join(''));
+                decimalOn = true;
+            }
+            
+        });
+
+
+        const backspaceButton = document.querySelector('#backspace');
+
+        backspaceButton.addEventListener('click', () => {
+            if (!operatorOn){
+                    a.pop();
+                    aNum = a.join('');
+                    if (aNum === ''){
+                        display(0);
+                    }else{
+                        display(aNum);
+                    }
+            }else{
+                b.pop();
+                bNum = b.join('');
+                if (bNum === ''){
+                    display(0);
+                }else{
+                    display(bNum);
+                }
+                display(bNum);
+            }
+        });
 
     </script>
 </body>
