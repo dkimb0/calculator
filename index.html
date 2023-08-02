@@ -6,8 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <div class="display">
+    <div class="displayResult">
         <p id="displayText"></p>
+        <p id="displayError"></p>
     </div>
     
     <div class="numButton">
@@ -71,13 +72,19 @@
             }
         }
 
-        function display(text){
+        function displayResult(text){
             document.getElementById('displayText').innerHTML = text;
         }
 
+        function displayError(text){
+            document.getElementById('displayError').innerHTML = text;
+        }
+
         function round(decimal){
-            if (decimal % 1 !== 0 && typeof decimal === "number"){
+            if (decimal % 1 !== 0 && typeof decimal === "number" &&
+            decimal.toString().length > 10){
                 return decimal.toFixed(9);
+                console.log(decimal);
             }else{
                 return decimal;
             }
@@ -93,13 +100,16 @@
         let aNum = 0;
         let bNum = NaN;
 
-        display(aNum);
+        displayResult(aNum);
+        displayError('No errors');
 
         let operatorOn = false;
         let decimalOn = false;
-        
+        let decimalBackspaceCheck = '';
+
         let lastOperator = '';
         let newOperator = '';
+
 
         //set up number button click events
         const numButtons = document.querySelectorAll('div.numButton > button');
@@ -109,11 +119,11 @@
                 if (!operatorOn){
                     a.push(event.target.innerText);
                     aNum = a.join('');
-                    display(aNum);
+                    displayResult(aNum);
                 }else{
                     b.push(event.target.innerText);
                     bNum = b.join('');
-                    display(bNum);
+                    displayResult(bNum);
                 }
                 
             });
@@ -126,10 +136,9 @@
             opButton.addEventListener('click', () => {
                 lastOperator = newOperator;
                 newOperator = event.target.innerText;
-
                 if (operatorOn){
                     aNum = operate(lastOperator, aNum, bNum);
-                    display(round(aNum));
+                    displayResult(round(aNum));
                     bNum = NaN;
                     b = [];
                 };
@@ -144,26 +153,29 @@
         const equalButton = document.querySelector('#equals');
 
         equalButton.addEventListener('click', () => {
-            if (bNum === 0 && newOperator === '/'){
-                display('Error: cannot divide by 0');
-                // aNum = 0;
-                // a = [];
-            }else if(Number.isNaN(bNum)){
-                display('Error: second number missing');
-                // aNum = 0;
-                // a = [];
+            if (bNum === '0' && newOperator === '/'){
+                aNum = 0;
+                bNum = NaN;
+                a = [];
+                b = [];
+                displayError('Error: cannot divide by 0');
+
             }else if(newOperator === ''){
-                display('Error: operator missing');
+                displayError('Error: operator missing');
+            
+
+            }else if(Number.isNaN(bNum)){
+                displayError('Error: second number missing');
+
 
             }else{
                 aNum = operate(newOperator, aNum, bNum);
-                display(round(aNum));
-                // aNum = 0;
+                displayResult(round(aNum));
+                a = 0;
                 bNum = NaN;
-                // a = [];
+                a = [];
                 b = [];
                 operatorOn = false;
-                // decimalOn = false;
             }
 
 
@@ -178,12 +190,13 @@
             a = [];
             b = [];
             aNum = 0;
-            bNum = 0;
+            bNum = NaN;
             operatorOn = false;
             decimalOn = false;
             lastOperator = '';
             newOperator = '';
-            display(aNum);
+            displayResult(aNum);
+            displayError('No errors');
         })
 
         const decimalButton = document.querySelector("#decimal");
@@ -192,11 +205,11 @@
             
             if(operatorOn === false && decimalOn === false){
                 a.push('.');
-                display(a.join(''));
+                displayResult(a.join(''));
                 decimalOn = true;
             }else if (operatorOn === true && decimalOn === false){
                 b.push('.');
-                display(b.join(''));
+                displayResult(b.join(''));
                 decimalOn = true;
             }
             
@@ -207,22 +220,28 @@
 
         backspaceButton.addEventListener('click', () => {
             if (!operatorOn){
-                    a.pop();
+                    decimalBackspaceCheck = a.pop();
+                    if (decimalBackspaceCheck === '.'){
+                        decimalOn = false;
+                    }
                     aNum = a.join('');
                     if (aNum === ''){
-                        display(0);
+                        displayResult(0);
                     }else{
-                        display(aNum);
+                        displayResult(aNum);
                     }
             }else{
-                b.pop();
+                decimalBackspaceCheck = b.pop();
+                if (decimalBackspaceCheck === '.'){
+                        decimalOn = false;
+                    }
                 bNum = b.join('');
                 if (bNum === ''){
-                    display(0);
+                    displayResult(0);
                 }else{
-                    display(bNum);
+                    displayResult(bNum);
                 }
-                display(bNum);
+                displayResult(bNum);
             }
         });
 
